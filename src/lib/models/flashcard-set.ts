@@ -29,4 +29,6 @@ const flashcardSetSchema = new mongoose.Schema<IFlashcardSet>({
 }, { timestamps: true });
 
 
-export default mongoose.model<IFlashcardSet>('FlashcardSet', flashcardSetSchema);;
+const FlashcardSet = mongoose.models.FlashcardSet || mongoose.model<IFlashcardSet>('FlashcardSet', flashcardSetSchema);
+
+export default FlashcardSet;
