@@ -1,5 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk';
 
+export interface IToolResponse {
+    subject: string;
+    topic: string;
+    name: string;
+    flashcards: [{
+        question: string;
+        answer: string;
+        example?: string;
+    }]
+}
+
+
 const FLASHCARD_PATTERNS = [
     /(?:create|make|generate) flashcards? (?:for|about|on) (.+)/i,
     /(?:create|make|generate) (?:some|a set of) flashcards? (?:for|about|on) (.+)/i,
@@ -34,7 +46,7 @@ export default async function chatWithClaude(input: string) {
                 tools:
                 [
                     {
-                        name: "generate_flashcards",
+                        name: "create_flashcard_set",
                         description: "Generate educational flashcards for studying a specific topic",
                         input_schema: {
                             type: "object",
@@ -80,9 +92,9 @@ export default async function chatWithClaude(input: string) {
             })
         });
 
-        let toolResponse : any;
+        let toolResponse : IToolResponse | null = null;
         if (shouldGenerate && msg.content[1].type === 'tool_use') {
-            toolResponse = msg.content[1].input;
+            toolResponse = msg.content[1].input as IToolResponse;
         }
 
         return { msg, toolResponse };
