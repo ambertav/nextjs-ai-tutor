@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { IFlashcard } from '@/lib/models/flashcard';
 import { IFlashcardSet } from '@/lib/models/flashcard-set';
-import Flashcard from '@/app/components/Flashcard';
+import Flashcard from '@/app/components/FlashcardItem';
 
 export interface FlashcardSet extends IFlashcardSet {
   _id: string;
