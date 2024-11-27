@@ -49,60 +49,65 @@ export default function FlashcardSet() {
 
   const handleNext = () => {
     if (currentIndex < flashcards.length - 1) {
-      setCurrentIndex(currentIndex + 1);
       setFlipState(false);
+      setCurrentIndex(currentIndex + 1);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
       setFlipState(false);
+      setCurrentIndex(currentIndex - 1);
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <main className="flex flex-col p-4 h-screen">Loading...</main>;
   }
 
   const currentFlashcard = flashcards[currentIndex];
 
   return (
-    <main>
-      <Link href={'/'}>Back to main page</Link>
-      <div>
-        <h1>{flashcardSet?.name}</h1>
-        <p className="text-sm text-gray-600">
-          {flashcardSet?.subject} - {flashcardSet?.topic}
-        </p>
-        <p className="text-sm text-gray-600">{flashcardSet?.description}</p>
-      </div>
-      {currentFlashcard && (
-        <div className="flex flex-col items-center justify-center h-screen space-y-6">
-          <Flashcard
-            question={currentFlashcard.question}
-            answer={currentFlashcard.answer}
-            isFlipped={flipState}
-            onFlip={handleFlip}
-          />
-          <div className="flex space-x-4">
-            <button
-              onClick={handlePrev}
-              className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-              disabled={currentIndex === 0}
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleNext}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 disabled:opacity-50"
-              disabled={currentIndex === flashcards.length - 1}
-            >
-              Next
-            </button>
-          </div>
+    <main className="flex flex-col p-4 h-screen">
+      <Link href={'/'} className="text-blue-500 hover:underline mb-4">
+        Back to main page
+      </Link>
+      <section className="flex flex-col flex-1 p-4 bg-gray-100 rounded-lg">
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold">{flashcardSet?.name}</h1>
+          <p className="ml-2">
+            {flashcardSet?.subject} - {flashcardSet?.topic}
+          </p>
+          <p className="ml-4 text-sm">{flashcardSet?.description}</p>
         </div>
-      )}
+        {currentFlashcard && (
+          <div className="flex flex-col items-center justify-center space-y-6 w-full max-w-4xl mx-auto">
+            <Flashcard
+              question={currentFlashcard.question}
+              answer={currentFlashcard.answer}
+              example={currentFlashcard.example}
+              isFlipped={flipState}
+              onFlip={handleFlip}
+            />
+            <div className="flex space-x-4">
+              <button
+                onClick={handlePrev}
+                className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+                disabled={currentIndex === 0}
+              >
+                Previous
+              </button>
+              <button
+                onClick={handleNext}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 disabled:opacity-50"
+                disabled={currentIndex === flashcards.length - 1}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
     </main>
   );
 }
