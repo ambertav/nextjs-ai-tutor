@@ -36,8 +36,11 @@ export default function Home() {
       // Add Claude's response to the chat
       setChatMessages((prevMessages) => [
         ...prevMessages,
-        `Claude: ${data.text}`,
+        `Claude: ${data.msg}`,
+        ...(data.setId ? [`Link to flashcards: /flashcard-set/${data.setId}`] : []),
       ]);
+
+
     } catch (error) {
       setChatMessages((prevMessages) => [...prevMessages, `Claude: ${error}`]);
     } finally {
