@@ -1,11 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import FlashcardSet from '@/lib/models/flashcard-set';
 import Flashcard from '@/lib/models/flashcard';
 
-export async function GET(req: Request, { params: { id } }: { params: { id: string } }) {
+
+// note: issue with typing per Vercel, was not successful with either @ts-ignore or @ts-expect-error
+export async function GET(req: NextRequest /* { params }: { params: { id: string } } */) {
     try {
+        // const { id } = await params;
+
+
+        // accessing id via url rather than params due to issue noted above
+        const url = new URL(req.url);
+        const id = url.pathname.split('/')[3];
+
         await connectToDatabase();
 
         if (!ObjectId.isValid(id)) {

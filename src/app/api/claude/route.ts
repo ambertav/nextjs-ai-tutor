@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import chatWithClaude from '@/lib/claude-anthropic';
 import connectToDatabase from '@/lib/mongodb';
@@ -6,9 +6,9 @@ import FlashcardSet from '@/lib/models/flashcard-set';
 import Flashcard from '@/lib/models/flashcard';
 import { IToolResponse } from '@/lib/claude-anthropic';
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const { input } = await request.json();
+        const { input } = await req.json();
         const { msg, toolResponse }: { msg: Anthropic.Messages.Message, toolResponse: IToolResponse | null } = await chatWithClaude(input);
 
         let setId: string = '';

@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import FlashcardSet from '@/lib/models/flashcard-set';
 import connectToDatabase from '@/lib/mongodb';
 
-export async function GET(request: Request) {
+export async function GET(req: NextRequest) {
     try {
         await connectToDatabase();
 
-        const url = new URL(request.url);
+        const url = new URL(req.url);
         const sortBy = url.searchParams.get('sortBy') || 'mostRecent';
 
         const flashcardSets = sortBy === 'mostRecent' ? await getByMostRecent() : await aggregateBySubject();
