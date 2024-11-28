@@ -1,22 +1,28 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import Sidebar from './components/Sidebar';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [userInput, setUserInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [chatMessages, setChatMessages] = useState<
+    { type: 'user' | 'claude'; text: string }[]
+  >([]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!userInput.trim()) return; // Don't submit empty input
+  const handleKeyPress = (evt: React.KeyboardEvent) => {
+    if (evt.key === 'Enter' && !evt.shiftKey) {
+      evt.preventDefault();
+      handleSubmit(evt as React.FormEvent);
+    }
+  };
+
+  const handleSubmit = async (evt: React.FormEvent) => {
+    evt.preventDefault();
+    if (!userInput.trim()) return;
 
     setIsLoading(true);
-
-    // Add user's message to the chat
-    setChatMessages((prevMessages) => [...prevMessages, `User: ${userInput}`]);
 
     try {
       const response = await fetch(`/api/claude`, {
@@ -24,7 +30,8 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ input: userInput }), // Sending user input as the body of the request
+        // send user input so route can interact with API
+        body: JSON.stringify({ input: userInput }),
       });
 
       if (!response.ok) {
@@ -33,16 +40,37 @@ export default function Home() {
 
       const data = await response.json();
 
-      // Add Claude's response to the chat
+      // add input and response to messages
+      setChatMessages((prevMessages: any) => {
+        const newMessages = [
+          ...prevMessages,
+          { type: 'user', text: userInput },
+          { type: 'claude', text: data.msg },
+        ];
+
+        if (data.setId) {
+          (newMessages).push({
+            type: 'claude',
+            text: (
+              <>
+                <Link
+                  href={`/flashcard-sets/${data.setId}`}
+                  className="text-blue-800 hover:underline mb-4"
+                >
+                  View Flashcards
+                </Link>
+              </>
+            ),
+          });
+        }
+
+        return newMessages;
+      });
+    } catch (error : any) {
       setChatMessages((prevMessages) => [
         ...prevMessages,
-        `Claude: ${data.msg}`,
-        ...(data.setId ? [`Link to flashcards: /flashcard-set/${data.setId}`] : []),
+        { type: 'claude', text: `Error: ${error.message}` },
       ]);
-
-
-    } catch (error) {
-      setChatMessages((prevMessages) => [...prevMessages, `Claude: ${error}`]);
     } finally {
       setIsLoading(false);
       setUserInput('');
@@ -50,27 +78,45 @@ export default function Home() {
   };
 
   return (
-    <main>
+    <main className="flex p-4 h-screen">
       <Sidebar />
-      <section>
-        <h2>Chat with Claude</h2>
 
-        {/* Display chat messages */}
-        <div className="chat-box">
+      {/* Chatbox */}
+      <section className="flex flex-col flex-1 p-4 bg-gray-100 rounded-lg">
+        <h1 className="text-center text-2xl font-semibold text-gray-800">
+          Chat with Claude
+        </h1>
+
+        <div className="flex-1 overflow-y-auto mb-4">
           {chatMessages.map((msg, idx) => (
-            <p key={idx}>{msg}</p>
+            <div
+              key={idx}
+              className={`${
+                msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'
+              }`}
+            >
+              <div className="message-text p-2 max-w-xs bg-gray-300 rounded-lg mb-2">
+                {msg.text}
+              </div>
+            </div>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit}>
+        {/* Input form */}
+        <form onSubmit={handleSubmit} className="flex mt-auto">
           <textarea
             value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
+            onChange={(evt) => setUserInput(evt.target.value)}
+            onKeyDown={handleKeyPress}
             placeholder="Enter your message..."
-            rows={4}
-            className="text-box"
+            rows={3}
+            className="text-box p-2 mb-2 border rounded w-full"
           />
-          <button type="submit" disabled={isLoading}>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="flex-1 p-4 bg-gray-100 rounded-lg"
+          >
             {isLoading ? 'Sending...' : 'Send'}
           </button>
         </form>

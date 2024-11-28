@@ -20,8 +20,9 @@ export interface SetSubject {
 
 export default function Sidebar() {
   const [flashcardSetsData, setFlashcardSetsData] = useState<
-    SetSubject[] | FlashcardSet[]
-  >([]);
+    SetSubject[] | FlashcardSet[] | null
+  >(null);
+
   const [sortBy, setSortBy] = useState<'subject' | 'mostRecent'>('mostRecent');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,8 +33,8 @@ export default function Sidebar() {
         const response = await fetch(`/api/flashcards?sortBy=${sortBy}`);
         const data = await response.json();
         // data is either:
-        // flat array of sorted by most recent flashcard sets
-        // grouped by subject and topic (e.g., Mathematics > Calculus > FlashcardSet)
+            // flat array of sorted by most recent flashcard sets
+            // grouped by subject and topic (e.g., Mathematics > Calculus > FlashcardSet)
         setFlashcardSetsData(data);
       } catch (error) {
         setError('Error fetching flashcard sets');
@@ -46,77 +47,99 @@ export default function Sidebar() {
     fetchFlashcardSets();
   }, [sortBy]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <aside>
-      <div>
-        <label>
-          <input
-            type="radio"
-            name="sortBy"
-            value="mostRecent"
-            checked={sortBy === 'mostRecent'}
-            onChange={() => setSortBy('mostRecent')}
-          />
-          Sort by Most Recent
-        </label>
-        <br />
-        <label>
-          <input
-            type="radio"
-            name="sortBy"
-            value="subject"
-            checked={sortBy === 'subject'}
-            onChange={() => setSortBy('subject')}
-          />
-          Sort by Subject
-        </label>
-      </div>
-
-      {flashcardSetsData.length === 0 ? (
-        <p>No flashcard sets available.</p>
-      ) : Array.isArray(flashcardSetsData) &&
-        flashcardSetsData[0]?.hasOwnProperty('topics') ? (
-        // grouped by subject
-        <ul>
-          {(flashcardSetsData as SetSubject[]).map((subject) => (
-            <li key={subject._id}>
-              <details>
-                <summary>{subject._id}</summary>
-                <ul>
-                  {subject.topics.map((topic) => (
-                    <li key={topic.topic}>
-                      <details>
-                        <summary>{topic.topic}</summary>
-                        <ul>
-                          {topic.flashcardSets.map((set: FlashcardSet) => (
-                            <li key={set._id}>
-                              <Link href={`/flashcard-sets/${set._id}`}>
-                                {set.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </li>
-          ))}
-        </ul>
+    <aside className="w-1/4 mr-4 bg-gray-200 p-2 rounded-lg">
+      {isLoading || flashcardSetsData === null ? (
+        <p className="ml-4 mt-6">Loading...</p>
+      ) : flashcardSetsData?.length === 0 ? (
+        <p className="ml-4 mt-6">No flashcard sets available.</p>
       ) : (
-        // flat list of most recent
-        <ul>
-          {(flashcardSetsData as FlashcardSet[]).map((set) => (
-            <li key={set._id}>
-              <Link href={`/flashcard-sets/${set._id}`}>{set.name}</Link>
-            </li>
-          ))}
-        </ul>
+        // Sorting Buttons
+        <>
+          <div className="mb-6">
+            <label className="block text-sm font-semibold mb-2">Sort by:</label>
+            <div className="flex items-center mb-3">
+              <input
+                type="radio"
+                name="sortBy"
+                value="mostRecent"
+                checked={sortBy === 'mostRecent'}
+                onChange={() => setSortBy('mostRecent')}
+                className="mr-2"
+              />
+              <span className="text-sm">Most Recent</span>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="radio"
+                name="sortBy"
+                value="subject"
+                checked={sortBy === 'subject'}
+                onChange={() => setSortBy('subject')}
+                className="mr-2"
+              />
+              <span className="text-sm">By Subject</span>
+            </div>
+          </div>
+
+          <div>
+            {/* Flashcard Set Display */}
+            {Array.isArray(flashcardSetsData) &&
+            flashcardSetsData[0]?.hasOwnProperty('topics') ? (
+              // Grouped by subject
+              <ul>
+                {(flashcardSetsData as SetSubject[])?.map((subject) => (
+                  <li key={subject._id}>
+                    <details className="mb-4">
+                      <summary className="font-semibold cursor-pointer">
+                        {subject._id}
+                      </summary>
+                      <ul className="ml-4 my-2">
+                        {subject.topics.map((topic) => (
+                          <li key={topic.topic}>
+                            <details className="my-2">
+                              <summary className="font-medium cursor-pointer">
+                                {topic.topic}
+                              </summary>
+                              <ul className="ml-6 my-2">
+                                {topic.flashcardSets.map(
+                                  (set: FlashcardSet) => (
+                                    <li key={set._id}>
+                                      <Link
+                                        href={`/flashcard-sets/${set._id}`}
+                                        className="cursor-pointer hover:underline"
+                                      >
+                                        {set.name}
+                                      </Link>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </details>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              // Flat list of most recent
+              <ul className="max-h-80 overflow-y-auto">
+                {(flashcardSetsData as FlashcardSet[])?.map((set) => (
+                  <li key={set._id} className="ml-2 my-2">
+                    <Link
+                      href={`/flashcard-sets/${set._id}`}
+                      className="cursor-pointer hover:underline"
+                    >
+                      {set.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
       )}
     </aside>
   );
