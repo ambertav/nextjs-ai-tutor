@@ -30,6 +30,8 @@ export async function POST(request: Request) {
 }
 
 async function createFlashcards(toolResponse: IToolResponse) {
+    let flashcardSetId: string | null = null;
+
     try {
         await connectToDatabase();
 
@@ -38,6 +40,8 @@ async function createFlashcards(toolResponse: IToolResponse) {
         const flashcardSet = await FlashcardSet.create({
             ...setInfo
         });
+
+        flashcardSetId = flashcardSet._id;
 
         const flashcardsToCreate = flashcards.map((card) => ({
             ...card,
@@ -49,6 +53,11 @@ async function createFlashcards(toolResponse: IToolResponse) {
         return flashcardSet._id;
 
     } catch (error) {
+        if (flashcardSetId) {
+            await FlashcardSet.deleteOne({ _id: flashcardSetId });
+            console.log(`Flashcard set ${flashcardSetId} deleted due to batch creation failure.`);
+        }
+
         console.error(error);
         throw error;
     }
