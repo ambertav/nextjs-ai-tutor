@@ -4,12 +4,15 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Sidebar from './components/Sidebar';
 
+interface IChatMessage {
+  type: 'user' | 'claude';
+  text: string | React.ReactNode;
+}
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [userInput, setUserInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<
-    { type: 'user' | 'claude'; text: string }[]
-  >([]);
+  const [chatMessages, setChatMessages] = useState<IChatMessage[]>([]);
 
   const handleKeyPress = (evt: React.KeyboardEvent) => {
     if (evt.key === 'Enter' && !evt.shiftKey) {
@@ -38,10 +41,10 @@ export default function Home() {
         throw new Error('Error sending request to Claude');
       }
 
-      const data = await response.json();
+      const data: { msg: string; setId?: string } = await response.json();
 
       // add input and response to messages
-      setChatMessages((prevMessages: any) => {
+      setChatMessages((prevMessages: IChatMessage[]) => {
         const newMessages = [
           ...prevMessages,
           { type: 'user', text: userInput },
@@ -64,7 +67,7 @@ export default function Home() {
           });
         }
 
-        return newMessages;
+        return newMessages as IChatMessage[];
       });
     } catch (error: unknown) {
       if (error instanceof Error) {
