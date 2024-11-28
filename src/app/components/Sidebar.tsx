@@ -46,7 +46,7 @@ export default function Sidebar() {
   }, [sortBy]);
 
   return (
-    <aside className="w-1/4 mr-4 bg-gray-200 p-2 rounded-lg">
+    <aside className="w-1/4 mr-4 bg-gray-200 p-2 rounded-lg min-h-[95%]">
       {isLoading || flashcardSetsData === null ? (
         <p className="ml-4 mt-6">Loading...</p>
       ) : flashcardSetsData?.length === 0 ? (

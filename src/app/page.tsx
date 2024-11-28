@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Sidebar from './components/Sidebar';
+import Footer from './components/Footer';
 
 interface IChatMessage {
   type: 'user' | 'claude';
@@ -88,11 +89,11 @@ export default function Home() {
   };
 
   return (
-    <main className="flex p-4 h-screen">
+    <main className="flex p-4 h-screen flex-wrap">
       <Sidebar />
 
       {/* Chatbox */}
-      <section className="flex flex-col flex-1 p-4 bg-gray-100 rounded-lg">
+      <section className="flex flex-col flex-1 p-4 bg-gray-100 rounded-lg min-h-[95%]">
         <h1 className="text-center text-2xl font-semibold text-gray-800">
           Chat with Claude
         </h1>
@@ -131,6 +132,7 @@ export default function Home() {
           </button>
         </form>
       </section>
+      <Footer />
     </main>
   );
 }

@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { IFlashcard } from '@/lib/models/flashcard';
 import { IFlashcardSet } from '@/lib/models/flashcard-set';
 import Flashcard from '@/app/components/FlashcardItem';
+import Footer from '@/app/components/Footer';
 
 export interface FlashcardSet extends IFlashcardSet {
   _id: string;
@@ -70,7 +71,7 @@ export default function FlashcardSet() {
       <Link href={'/'} className="text-blue-500 hover:underline mb-4">
         Back to main page
       </Link>
-      <section className="flex flex-col flex-1 p-4 bg-gray-100 rounded-lg">
+      <section className="flex flex-col flex-1 p-4 bg-gray-100 rounded-lg min-h-[90%]">
         <div className="mb-10">
           <h1 className="text-3xl font-bold">{flashcardSet?.name}</h1>
           <p className="ml-2">
@@ -106,6 +107,7 @@ export default function FlashcardSet() {
           </div>
         )}
       </section>
+      <Footer />
     </main>
   );
 }
