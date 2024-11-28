@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { IFlashcard } from '@/lib/models/flashcard';
@@ -22,7 +22,6 @@ export default function FlashcardSet() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipState, setFlipState] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFlashcards = async () => {
@@ -33,7 +32,6 @@ export default function FlashcardSet() {
         setFlashcardSet(data.flashcardSet);
         setFlashcards(data.flashcards);
       } catch (error) {
-        setError('Error fetching flashcard sets');
         console.error('Error fetching flashcard sets:', error);
       } finally {
         setIsLoading(false);
@@ -41,7 +39,7 @@ export default function FlashcardSet() {
     };
 
     fetchFlashcards();
-  }, []);
+  }, [id]);
 
   const handleFlip = () => {
     setFlipState((prev) => !prev);

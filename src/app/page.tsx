@@ -49,7 +49,7 @@ export default function Home() {
         ];
 
         if (data.setId) {
-          (newMessages).push({
+          newMessages.push({
             type: 'claude',
             text: (
               <>
@@ -66,11 +66,18 @@ export default function Home() {
 
         return newMessages;
       });
-    } catch (error : any) {
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        { type: 'claude', text: `Error: ${error.message}` },
-      ]);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setChatMessages((prevMessages) => [
+          ...prevMessages,
+          { type: 'claude', text: `Error: ${error.message}` },
+        ]);
+      } else {
+        setChatMessages((prevMessages) => [
+          ...prevMessages,
+          { type: 'claude', text: 'Error: An unknown error occurred.' },
+        ]);
+      }
     } finally {
       setIsLoading(false);
       setUserInput('');

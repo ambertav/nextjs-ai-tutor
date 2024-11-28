@@ -24,7 +24,7 @@ function shouldGenerateFlashcards(input: string): { should: boolean; topic?: str
     for (const pattern of FLASHCARD_PATTERNS) {
         const match = input.match(pattern);
         if (match) {
-            return { should: true, topic: match[1].trim() };
+            return { should: true };
         }
     }
     return { should: false };
@@ -36,7 +36,7 @@ export default async function chatWithClaude(input: string) {
             apiKey: process.env.ANTHROPIC_API_KEY as string
         });
 
-        const { should: shouldGenerate, topic } = shouldGenerateFlashcards(input);
+        const { should: shouldGenerate } = shouldGenerateFlashcards(input);
 
         const msg = await anthropic.messages.create({
             model: 'claude-3-5-sonnet-20241022',

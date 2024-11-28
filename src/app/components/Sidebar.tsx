@@ -25,7 +25,6 @@ export default function Sidebar() {
 
   const [sortBy, setSortBy] = useState<'subject' | 'mostRecent'>('mostRecent');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFlashcardSets = async () => {
@@ -37,7 +36,6 @@ export default function Sidebar() {
             // grouped by subject and topic (e.g., Mathematics > Calculus > FlashcardSet)
         setFlashcardSetsData(data);
       } catch (error) {
-        setError('Error fetching flashcard sets');
         console.error('Error fetching flashcard sets:', error);
       } finally {
         setIsLoading(false);
